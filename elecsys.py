@@ -99,6 +99,7 @@ def compute_gallagher_index(votes, result):
             si = result[electoral_list] / n_total_seats
             s += (vi - si) ** 2
     index = (s / 2) ** .5
+    index *= 100
     return index
 
 def compseats(n_seats, votes, method, index):

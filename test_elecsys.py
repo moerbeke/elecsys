@@ -7,6 +7,7 @@ elecsys - Apply electoral systems to compute seats from votes.
 from unittest import TestCase
 
 from elecsys import sainte_lague_algorithm, modified_sainte_lague_algorithm, dhondt_algorithm, hare_algorithm, droop_algorithm
+from elecsys import compute_gallagher_index
 
 # Test cases taken from Gallagher & Mitchel's book: "The Politics of Electoral Systems"
 
@@ -27,12 +28,6 @@ votes = {
         }
 
 class TestAlgorithm(TestCase):
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
 
     def test_sainte_lague(self):
         expected = {
@@ -93,3 +88,28 @@ class TestAlgorithm(TestCase):
                 }
         result = droop_algorithm(N_SEATS, votes)
         self.assertEqual(result, expected)
+
+class TestIndex(TestCase):
+
+    def test_gallagher(self):
+        v_s = {
+                'Fianna Fáil': (703682, 77),
+                'Fine Gael': (499936, 54),
+                'Labour': (186044, 17),
+                'PDs': (83765, 4),
+                'Democratic Left': (44901, 4),
+                'Green Party': (49323, 2),
+                'Sinn Féin': (45614, 1),
+                'National Party': (19077, 0),
+                'Socialist Party': (12445, 1),
+                'Christian Solidarity': (8357, 0),
+                'Worker\'s Party': (7808, 0),
+                'Others': (128033, 6)
+                }
+        votes = dict()
+        seats = dict()
+        for party in v_s:
+            votes[party] = v_s[party][0]
+            seats[party] = v_s[party][1]
+        expected = 6.94
+        self.assertEqual(round(compute_gallagher_index(votes, seats), 2), expected)

@@ -32,6 +32,8 @@ def main():
     index = args.index
     # Compute seats
     seats = compseats(n_seats, votes, method, index)
+    if index:
+        seats['gallagher_index'] = round(seats['gallagher_index'], 2)
     print(seats)
 
 if __name__ == '__main__':
