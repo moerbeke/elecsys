@@ -7,6 +7,7 @@ compute-seats - Apply electoral systems to compute seats from votes.
 '''
 
 import argparse
+import pkg_resources  # part of setuptools
 from elecsys import compseats
 
 def parse_cmd_line_args():
@@ -16,7 +17,8 @@ def parse_cmd_line_args():
     parser.add_argument("votes", nargs=1, type=str, action='store', help="number of votes obtained by each electoral list (e.g.: l1:5,l2:0,l3:12)")
     parser.add_argument("method", nargs=1, type=str, choices=["sl", "ms", "dh", "ha", "dr"], action='store', help="electoral method")
     parser.add_argument('-i', '--index', action='store_true', help="compute Gallagher index")
-    parser.add_argument('-v', '--version', action='version', version='%(prog)s 0.1.0')
+    version = pkg_resources.require('elecsys')[0].version
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + version)
     args = parser.parse_args()
     return args
 
