@@ -4,6 +4,8 @@ Copyright (C) 2023 Antonio Ceballos Roa
 elecsys - Apply electoral systems to compute seats from votes.
 '''
 
+from math import ceil
+
 class BadSeats(Exception):
     pass
 
@@ -26,12 +28,12 @@ def dhondt_algorithm(n_seats, votes):
     return highest_averages(divisors, votes)
 
 def hare_algorithm(n_seats, votes):
-    quota = sum(votes.values()) / n_seats
-    return highest_reminder(n_seats, quota, votes)
+    quota = ceil(sum(votes.values()) / n_seats)
+    return highest_remainder(n_seats, quota, votes)
 
 def droop_algorithm(n_seats, votes):
-    quota = 1 + sum(votes.values()) / (1 + n_seats)
-    return highest_reminder(n_seats, quota, votes)
+    quota = ceil(1 + sum(votes.values()) / (1 + n_seats))
+    return highest_remainder(n_seats, quota, votes)
 
 def highest_averages(divisors, votes):
     ratio = dict()
@@ -40,28 +42,27 @@ def highest_averages(divisors, votes):
         for i in range(len(divisors)):
             divisor = divisors[i]
             ratio[(electoral_list, i)] = list_votes / divisor
-    ratios = [r[0] for r in dict(sorted(ratio.items(), key = lambda x: x[1], reverse=True))]
+    party_with_highest_ratio = [r[0] for r in dict(sorted(ratio.items(), key = lambda x: x[1], reverse=True))]
     result = dict()
-    for r in range(len(divisors)):
-        electoral_list = ratios[r][0]
+    for party in party_with_highest_ratio[:len(divisors)]:
         try:
-            result[electoral_list] += 1
+            result[party] += 1
         except KeyError:
-            result[electoral_list] = 1
+            result[party] = 1
     result = complete_empty_lists(result, votes)
     return result
 
-def highest_reminder(n_seats, quota, votes):
+def highest_remainder(n_seats, quota, votes):
     result = dict()
-    reminder = dict()
+    remainder = dict()
     for electoral_list in votes:
         list_votes = votes[electoral_list]
-        ratio = int(list_votes / quota)
+        ratio = list_votes // quota
         result[electoral_list] = ratio
-        reminder[electoral_list] = list_votes % quota
+        remainder[electoral_list] = list_votes % quota
     n_spare = n_seats - sum(result.values())
-    highest_reminders = [r[0] for r in dict(sorted(reminder.items(), key = lambda x: x[1], reverse=True))][:n_spare]
-    for electoral_list in highest_reminders:
+    highest_remainders = [r for r in dict(sorted(remainder.items(), key = lambda x: x[1], reverse=True))][:n_spare]
+    for electoral_list in highest_remainders:
         result[electoral_list] += 1
     return result
 
